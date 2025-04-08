@@ -1,4 +1,3 @@
-
 export interface Question {
   id: number;
   question: string;
@@ -293,3 +292,59 @@ export const leaderboard: LeaderboardEntry[] = [
     completedAt: '2025-04-08T12:15:00Z' 
   }
 ];
+
+export const saveQuizProgress = (quizId: string, answers: number[], currentQuestionIndex: number): void => {
+  const progress = {
+    answers,
+    currentQuestionIndex,
+    timestamp: new Date().toISOString(),
+  };
+  localStorage.setItem(`quiz_progress_${quizId}`, JSON.stringify(progress));
+};
+
+export const getQuizProgress = (quizId: string): { answers: number[], currentQuestionIndex: number } | null => {
+  const progress = localStorage.getItem(`quiz_progress_${quizId}`);
+  if (!progress) return null;
+  
+  const parsed = JSON.parse(progress);
+  const savedTime = new Date(parsed.timestamp).getTime();
+  const currentTime = new Date().getTime();
+  const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
+  
+  if (hoursDiff > 24) {
+    localStorage.removeItem(`quiz_progress_${quizId}`);
+    return null;
+  }
+  
+  return {
+    answers: parsed.answers,
+    currentQuestionIndex: parsed.currentQuestionIndex
+  };
+};
+
+export const clearQuizProgress = (quizId: string): void => {
+  localStorage.removeItem(`quiz_progress_${quizId}`);
+};
+
+export const saveQuizResult = (quizId: string, username: string, score: number, timeTaken: number): void => {
+  const result = {
+    id: `result_${Date.now()}`,
+    quizId,
+    username,
+    score,
+    timeTaken,
+    completedAt: new Date().toISOString()
+  };
+  
+  const resultsJson = localStorage.getItem('quiz_results') || '[]';
+  const results = JSON.parse(resultsJson);
+  
+  results.push(result);
+  
+  localStorage.setItem('quiz_results', JSON.stringify(results));
+};
+
+export const getQuizResults = (): LeaderboardEntry[] => {
+  const resultsJson = localStorage.getItem('quiz_results') || '[]';
+  return JSON.parse(resultsJson);
+};

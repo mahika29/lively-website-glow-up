@@ -7,10 +7,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { quizzes, Quiz, Question } from '@/data/quizzes';
+import { 
+  quizzes, Quiz, Question, saveQuizProgress, 
+  getQuizProgress, clearQuizProgress, saveQuizResult 
+} from '@/data/quizzes';
 
 const TakeQuizPage = () => {
   const { quizId } = useParams();
@@ -27,6 +33,8 @@ const TakeQuizPage = () => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [answersRevealed, setAnswersRevealed] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+  const [username, setUsername] = useState('');
+  const [startTime, setStartTime] = useState<number | null>(null);
   
   // If no quizId is provided, show a list of all quizzes
   if (!quizId) {
@@ -52,6 +60,29 @@ const TakeQuizPage = () => {
     );
   }
   
+  // Load saved progress when the component mounts
+  useEffect(() => {
+    if (!quizSubmitted && quiz) {
+      // Initialize selected answers array
+      const newAnswers = new Array(quiz.questions.length).fill(-1);
+      setSelectedAnswers(newAnswers);
+      
+      // Check for saved progress
+      const savedProgress = getQuizProgress(quiz.id);
+      if (savedProgress) {
+        toast({
+          title: "Progress Restored",
+          description: "We've loaded your previous progress for this quiz.",
+        });
+        setSelectedAnswers(savedProgress.answers);
+        setCurrentQuestionIndex(savedProgress.currentQuestionIndex);
+      }
+      
+      // Set the start time
+      setStartTime(Date.now());
+    }
+  }, [quiz?.id, quizSubmitted]);
+  
   // Initialize the timer when the component mounts
   useEffect(() => {
     if (!quizSubmitted && quiz.timeLimit > 0) {
@@ -76,10 +107,12 @@ const TakeQuizPage = () => {
     }
   }, [quizSubmitted, quiz.timeLimit]);
   
-  // Initialize selected answers array
+  // Save progress whenever selectedAnswers or currentQuestionIndex changes
   useEffect(() => {
-    setSelectedAnswers(new Array(quiz.questions.length).fill(-1));
-  }, [quiz.questions.length]);
+    if (!quizSubmitted && quiz) {
+      saveQuizProgress(quiz.id, selectedAnswers, currentQuestionIndex);
+    }
+  }, [selectedAnswers, currentQuestionIndex, quizSubmitted, quiz]);
   
   // Format time remaining as MM:SS
   const formatTime = (seconds: number | null) => {
@@ -138,6 +171,12 @@ const TakeQuizPage = () => {
     setScore(calculatedScore);
     setQuizSubmitted(true);
     
+    // Calculate time taken in seconds
+    const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 600;
+    
+    // Clear progress since quiz is completed
+    clearQuizProgress(quiz.id);
+    
     toast({
       title: "Quiz Submitted",
       description: `Your score: ${calculatedScore}%. You got ${correctAnswers} out of ${quiz.questions.length} questions correct.`,
@@ -148,6 +187,29 @@ const TakeQuizPage = () => {
   const handleRevealAnswers = () => {
     setAnswersRevealed(true);
     setCurrentQuestionIndex(0);
+  };
+  
+  // Handle saving result to leaderboard
+  const handleSaveResult = () => {
+    if (!username.trim()) {
+      toast({
+        title: "Username Required",
+        description: "Please enter a username to save your result.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 600;
+    
+    saveQuizResult(quiz.id, username, score || 0, timeTaken);
+    
+    toast({
+      title: "Result Saved",
+      description: "Your quiz result has been saved to the leaderboard!",
+    });
+    
+    navigate('/leaderboard');
   };
   
   // Get the current question
@@ -188,8 +250,23 @@ const TakeQuizPage = () => {
                       <div className="font-medium capitalize">{quiz.difficulty}</div>
                       <div>Time taken:</div>
                       <div className="font-medium">
-                        {quiz.timeLimit - (timeRemaining ? Math.floor(timeRemaining / 60) : 0)} minutes
+                        {startTime ? Math.floor((Date.now() - startTime) / 60000) : quiz.timeLimit} minutes
                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <div className="mb-4">
+                      <label htmlFor="username" className="block text-sm font-medium mb-1">
+                        Enter your name to save your result
+                      </label>
+                      <Input
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Your name"
+                        className="max-w-md"
+                      />
                     </div>
                   </div>
                   
@@ -197,9 +274,14 @@ const TakeQuizPage = () => {
                     <Button variant="outline" onClick={handleRevealAnswers}>
                       Review Answers
                     </Button>
-                    <Button asChild>
-                      <Link to="/take">Take Another Quiz</Link>
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button variant="secondary" asChild>
+                        <Link to="/take">Take Another Quiz</Link>
+                      </Button>
+                      <Button onClick={handleSaveResult}>
+                        Save Result
+                      </Button>
+                    </div>
                   </div>
                   
                   {score && score >= 70 && (
