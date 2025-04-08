@@ -96,7 +96,7 @@
 
 @layer components {
   .quiz-card {
-    @apply relative overflow-hidden rounded-xl border bg-white p-6 shadow-md transition-all hover:shadow-lg;
+    @apply relative overflow-hidden rounded-xl border bg-white dark:bg-gray-800 p-6 shadow-md transition-all hover:shadow-lg;
   }
   
   .quiz-button {
@@ -104,26 +104,42 @@
   }
   
   .quiz-button-primary {
-    @apply bg-quiz-primary text-white hover:bg-quiz-primary/90;
+    @apply bg-quiz-primary text-white hover:bg-quiz-primary/90 dark:bg-quiz-dark-primary dark:hover:bg-quiz-dark-primary/90;
   }
   
   .quiz-button-secondary {
-    @apply bg-quiz-secondary text-white hover:bg-quiz-secondary/90;
+    @apply bg-quiz-secondary text-white hover:bg-quiz-secondary/90 dark:bg-quiz-dark-secondary dark:hover:bg-quiz-dark-secondary/90;
   }
   
   .quiz-option {
-    @apply cursor-pointer rounded-lg border-2 border-gray-200 p-4 hover:border-quiz-neutral transition-all;
+    @apply cursor-pointer rounded-lg border-2 border-gray-200 dark:border-gray-700 p-4 hover:border-quiz-neutral dark:hover:border-quiz-dark-neutral transition-all;
   }
   
   .quiz-option-selected {
-    @apply border-quiz-neutral bg-quiz-neutral/10;
+    @apply border-quiz-neutral dark:border-quiz-dark-neutral bg-quiz-neutral/10 dark:bg-quiz-dark-neutral/10;
   }
   
   .quiz-option-correct {
-    @apply border-quiz-correct bg-quiz-correct/10;
+    @apply border-quiz-correct dark:border-quiz-dark-correct bg-quiz-correct/10 dark:bg-quiz-dark-correct/10;
   }
   
   .quiz-option-incorrect {
-    @apply border-quiz-incorrect bg-quiz-incorrect/10;
+    @apply border-quiz-incorrect dark:border-quiz-dark-incorrect bg-quiz-incorrect/10 dark:bg-quiz-dark-incorrect/10;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
   }
 }
