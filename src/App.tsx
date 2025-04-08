@@ -10,25 +10,28 @@ import TakeQuiz from "./pages/TakeQuiz";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
+// Create a new QueryClient instance
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/create" element={<CreateQuiz />} />
-          <Route path="/take" element={<TakeQuiz />} />
-          <Route path="/take/:quizId" element={<TakeQuiz />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/create" element={<CreateQuiz />} />
+            <Route path="/take" element={<TakeQuiz />} />
+            <Route path="/take/:quizId" element={<TakeQuiz />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+};
 
 export default App;
