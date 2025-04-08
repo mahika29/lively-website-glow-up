@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, ChevronLeft, Clock, AlertTriangle, Check, X 
@@ -8,13 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { 
-  quizzes, Quiz, Question, saveQuizProgress, 
+  quizzes, Quiz, saveQuizProgress, 
   getQuizProgress, clearQuizProgress, saveQuizResult 
 } from '@/data/quizzes';
 
@@ -60,6 +57,41 @@ const TakeQuizPage = () => {
     );
   }
   
+  // Define handleSubmitQuiz before it's used in useEffect
+  const handleSubmitQuiz = useCallback(() => {
+    // Check if there are any unanswered questions
+    const unansweredCount = selectedAnswers.filter(a => a === -1).length;
+    
+    if (unansweredCount > 0 && !quizSubmitted) {
+      toast({
+        title: `${unansweredCount} question${unansweredCount > 1 ? 's' : ''} unanswered`,
+        description: "Are you sure you want to submit? You can go back and review your answers.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Calculate score
+    const correctAnswers = selectedAnswers.reduce((count, answer, index) => {
+      return count + (answer === quiz.questions[index].correctAnswer ? 1 : 0);
+    }, 0);
+    
+    const calculatedScore = Math.round((correctAnswers / quiz.questions.length) * 100);
+    setScore(calculatedScore);
+    setQuizSubmitted(true);
+    
+    // Calculate time taken in seconds
+    const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 600;
+    
+    // Clear progress since quiz is completed
+    clearQuizProgress(quiz.id);
+    
+    toast({
+      title: "Quiz Submitted",
+      description: `Your score: ${calculatedScore}%. You got ${correctAnswers} out of ${quiz.questions.length} questions correct.`,
+    });
+  }, [quiz, selectedAnswers, quizSubmitted, startTime, toast]);
+  
   // Load saved progress when the component mounts
   useEffect(() => {
     if (!quizSubmitted && quiz) {
@@ -81,7 +113,7 @@ const TakeQuizPage = () => {
       // Set the start time
       setStartTime(Date.now());
     }
-  }, [quiz?.id, quizSubmitted]);
+  }, [quiz, quizSubmitted, toast]);
   
   // Initialize the timer when the component mounts
   useEffect(() => {
@@ -105,7 +137,7 @@ const TakeQuizPage = () => {
       // Clean up on component unmount
       return () => clearInterval(timer);
     }
-  }, [quizSubmitted, quiz.timeLimit]);
+  }, [quizSubmitted, quiz.timeLimit, handleSubmitQuiz]);
   
   // Save progress whenever selectedAnswers or currentQuestionIndex changes
   useEffect(() => {
@@ -147,41 +179,6 @@ const TakeQuizPage = () => {
   
   // Calculate progress percentage
   const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
-  
-  // Handle quiz submission
-  const handleSubmitQuiz = () => {
-    // Check if there are any unanswered questions
-    const unansweredCount = selectedAnswers.filter(a => a === -1).length;
-    
-    if (unansweredCount > 0 && !quizSubmitted) {
-      toast({
-        title: `${unansweredCount} question${unansweredCount > 1 ? 's' : ''} unanswered`,
-        description: "Are you sure you want to submit? You can go back and review your answers.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Calculate score
-    const correctAnswers = selectedAnswers.reduce((count, answer, index) => {
-      return count + (answer === quiz.questions[index].correctAnswer ? 1 : 0);
-    }, 0);
-    
-    const calculatedScore = Math.round((correctAnswers / quiz.questions.length) * 100);
-    setScore(calculatedScore);
-    setQuizSubmitted(true);
-    
-    // Calculate time taken in seconds
-    const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 600;
-    
-    // Clear progress since quiz is completed
-    clearQuizProgress(quiz.id);
-    
-    toast({
-      title: "Quiz Submitted",
-      description: `Your score: ${calculatedScore}%. You got ${correctAnswers} out of ${quiz.questions.length} questions correct.`,
-    });
-  };
   
   // Handle revealing answers
   const handleRevealAnswers = () => {
