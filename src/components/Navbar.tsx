@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen } from 'lucide-react';
+import { Menu, X, BookOpen, PenLine } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -13,7 +13,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="border-b bg-white dark:bg-gray-900">
+    <nav className="border-b bg-white dark:bg-gray-900 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -31,7 +31,8 @@ const Navbar = () => {
             <Link to="/create" className={`py-2 px-3 rounded-md text-sm font-medium ${isActivePath('/create') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}>
               Create Quiz
             </Link>
-            <Link to="/take" className={`py-2 px-3 rounded-md text-sm font-medium ${isActivePath('/take') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}>
+            <Link to="/take" className={`py-2 px-3 rounded-md text-sm font-medium flex items-center gap-1 ${isActivePath('/take') || location.pathname.startsWith('/take/') ? 'text-quiz-primary font-semibold' : 'text-gray-700 hover:text-quiz-primary'}`}>
+              <PenLine size={16} />
               Take Quiz
             </Link>
             <Link to="/leaderboard" className={`py-2 px-3 rounded-md text-sm font-medium ${isActivePath('/leaderboard') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}>
@@ -72,9 +73,10 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/take" 
-              className={`block py-2 px-3 rounded-md text-base font-medium ${isActivePath('/take') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}
+              className={`flex items-center gap-1 py-2 px-3 rounded-md text-base font-medium ${isActivePath('/take') || location.pathname.startsWith('/take/') ? 'text-quiz-primary font-semibold' : 'text-gray-700 hover:text-quiz-primary'}`}
               onClick={() => setIsMenuOpen(false)}
             >
+              <PenLine size={16} />
               Take Quiz
             </Link>
             <Link 
