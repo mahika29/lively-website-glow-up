@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import Flashcards from "./pages/Flashcards";
 import Categories from "./pages/Categories";
 import QuizExam from "./pages/QuizExam";
 import ShareQuiz from "./pages/ShareQuiz";
+import Settings from "./pages/Settings";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -53,6 +53,12 @@ const App = () => {
                 <Route path="/profile" element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <Settings />
                   </ProtectedRoute>
                 } />
                 

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, PenLine, Share2, Code } from 'lucide-react';
+import { Menu, X, BookOpen, PenLine, Share2, Code, Settings } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import UserProfileMenu from '@/components/UserProfileMenu';
@@ -41,6 +41,15 @@ const Navbar = () => {
             <Link to="/leaderboard" className={`py-2 px-3 rounded-md text-sm font-medium ${isActivePath('/leaderboard') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}>
               Leaderboard
             </Link>
+            {user && (
+              <Link 
+                to="/settings" 
+                className={`py-2 px-3 rounded-md text-sm font-medium flex items-center gap-1 ${isActivePath('/settings') ? 'text-quiz-primary font-semibold' : 'text-gray-700 hover:text-quiz-primary'}`}
+              >
+                <Settings size={16} />
+                Settings
+              </Link>
+            )}
             <UserProfileMenu />
           </div>
           
@@ -92,6 +101,16 @@ const Navbar = () => {
             >
               Leaderboard
             </Link>
+            {user && (
+              <Link 
+                to="/settings" 
+                className={`flex items-center gap-1 py-2 px-3 rounded-md text-base font-medium ${isActivePath('/settings') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Settings size={16} />
+                Settings
+              </Link>
+            )}
           </div>
         </div>
       )}
