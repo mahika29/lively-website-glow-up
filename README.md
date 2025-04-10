@@ -1,12 +1,14 @@
-# 🎨 Bitcoin Tracker
 
-A responsive and modern cryptocurrency dashboard built using **React**, **TypeScript**, and **Tailwind CSS**. This project offers a clean and interactive user experience powered by **Vite** and styled with **shadcn-ui**.
+# 🎨 Quick Quiz
+
+A responsive and modern quiz platform built using **React**, **TypeScript**, and **Tailwind CSS**. This project offers a clean and interactive user experience powered by **Vite** and styled with **shadcn-ui**.
 
 ---
 
 ## 🚀 Features
 
-- 📊 Live crypto price tracking
+- 📊 Create, take, and manage quizzes
+- 🎓 Different access levels for students, teachers, and organizations
 - ⚡ Fast builds and hot reloading with Vite
 - 🎨 Consistent and beautiful UI with shadcn + Tailwind
 - 📱 Responsive design for all screen sizes
@@ -27,15 +29,36 @@ Make sure you have Node.js and npm installed. Then follow these steps:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/mahika29/Bitcoin-Tracker.git
+git clone https://github.com/harshavardhan-k/Quick-Quiz.git
 
 # 2. Navigate into the project folder
-cd Bitcoin-Tracker
+cd Quick-Quiz
 
 # 3. Install dependencies
 npm install
 
 # 4. Run the development server
 npm run dev
-💡 Motivation
-This project was built to explore modern UI frameworks and gain experience working with Vite and component libraries like shadcn-ui. It also demonstrates best practices in organizing a scalable and performant React application.
+```
+
+---
+
+## 💡 Motivation
+
+This project was built to provide an intuitive platform for creating and taking quizzes, with different access levels for students, teachers, and organizations.
+
+---
+
+## 👨‍💻 Developer Contact
+
+- **Developer:** Harshavardhan K
+- **Email:** harshavardhan07224@gmail.com
+- **Phone:** 9606264620
+
+---
+
+## 📜 License & Copyright
+
+© 2025 Quick Quiz. All rights reserved.
+This website belongs to Harshavardhan K.
+

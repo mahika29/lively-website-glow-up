@@ -6,13 +6,14 @@ interface User {
   name: string;
   email: string;
   avatarUrl?: string;
+  userType: 'student' | 'teacher' | 'organization';
 }
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, userType: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, userType: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -20,9 +21,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Mock users for demo purposes
 const mockUsers: User[] = [
-  { id: '1', name: 'Demo User', email: 'demo@example.com', avatarUrl: 'https://randomuser.me/api/portraits/lego/1.jpg' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', avatarUrl: 'https://randomuser.me/api/portraits/women/17.jpg' },
-  { id: '3', name: 'John Doe', email: 'john@example.com', avatarUrl: 'https://randomuser.me/api/portraits/men/22.jpg' },
+  { id: '1', name: 'Demo Student', email: 'demo@example.com', avatarUrl: 'https://randomuser.me/api/portraits/lego/1.jpg', userType: 'student' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', avatarUrl: 'https://randomuser.me/api/portraits/women/17.jpg', userType: 'teacher' },
+  { id: '3', name: 'John Doe', email: 'john@example.com', avatarUrl: 'https://randomuser.me/api/portraits/men/22.jpg', userType: 'organization' },
 ];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -31,35 +32,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Check for saved auth
-    const savedUser = localStorage.getItem('quizzyUser');
+    const savedUser = localStorage.getItem('quickQuizUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string, userType: string): Promise<boolean> => {
     setIsLoading(true);
     
     // Simulate API call
     return new Promise(resolve => {
       setTimeout(() => {
-        const foundUser = mockUsers.find(u => u.email === email);
+        // For demo, allow any credentials, but assign the correct user type
+        const foundUser = mockUsers.find(u => u.email === email) || {
+          id: `user_${Date.now()}`,
+          name: email.split('@')[0],
+          email,
+          avatarUrl: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 8) + 1}.jpg`,
+          userType: userType as 'student' | 'teacher' | 'organization'
+        };
         
-        if (foundUser) {
-          setUser(foundUser);
-          localStorage.setItem('quizzyUser', JSON.stringify(foundUser));
-          resolve(true);
-        } else {
-          resolve(false);
-        }
+        // Override with selected user type
+        const loginUser = {
+          ...foundUser,
+          userType: userType as 'student' | 'teacher' | 'organization'
+        };
+        
+        setUser(loginUser);
+        localStorage.setItem('quickQuizUser', JSON.stringify(loginUser));
+        resolve(true);
         
         setIsLoading(false);
       }, 800);
     });
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, userType: string): Promise<boolean> => {
     setIsLoading(true);
     
     // Simulate API call
@@ -74,11 +84,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             id: `user_${Date.now()}`,
             name,
             email,
-            avatarUrl: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 8) + 1}.jpg`
+            avatarUrl: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 8) + 1}.jpg`,
+            userType: userType as 'student' | 'teacher' | 'organization'
           };
           
           setUser(newUser);
-          localStorage.setItem('quizzyUser', JSON.stringify(newUser));
+          localStorage.setItem('quickQuizUser', JSON.stringify(newUser));
           resolve(true);
         }
         
@@ -89,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('quizzyUser');
+    localStorage.removeItem('quickQuizUser');
   };
 
   return (

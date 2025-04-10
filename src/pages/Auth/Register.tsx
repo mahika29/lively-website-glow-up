@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
@@ -18,6 +19,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [userType, setUserType] = useState('student');
   const { register } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -46,12 +48,12 @@ const Register = () => {
     setIsRegistering(true);
     
     try {
-      const success = await register(name, email, password);
+      const success = await register(name, email, password, userType);
       
       if (success) {
         toast({
           title: "Registration successful",
-          description: "Welcome to Quizzy! You're now logged in."
+          description: `Welcome to Quick Quiz! You're now logged in as a ${userType}.`
         });
         navigate('/');
       } else {
@@ -79,7 +81,7 @@ const Register = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
-            <CardDescription>Enter your details to register</CardDescription>
+            <CardDescription>Register for Quick Quiz</CardDescription>
           </CardHeader>
           <form onSubmit={handleRegister}>
             <CardContent className="space-y-4">
@@ -92,6 +94,38 @@ const Register = () => {
                   placeholder="Enter your name"
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Account Type</Label>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={setUserType}
+                  className="flex flex-col space-y-2 mt-2"
+                >
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="student" id="reg-student" />
+                    <Label htmlFor="reg-student" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Student</div>
+                      <div className="text-xs text-muted-foreground">Access to join and create tests</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="teacher" id="reg-teacher" />
+                    <Label htmlFor="reg-teacher" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Teacher</div>
+                      <div className="text-xs text-muted-foreground">Access to create, modify and deploy tests</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="organization" id="reg-organization" />
+                    <Label htmlFor="reg-organization" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Organization</div>
+                      <div className="text-xs text-muted-foreground">Full access to all services</div>
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

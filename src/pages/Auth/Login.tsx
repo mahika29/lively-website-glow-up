@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
@@ -16,6 +17,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [userType, setUserType] = useState('student');
   const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -35,12 +37,12 @@ const Login = () => {
     setIsLoggingIn(true);
     
     try {
-      const success = await login(email, password);
+      const success = await login(email, password, userType);
       
       if (success) {
         toast({
           title: "Login successful",
-          description: "Welcome back to Quizzy!"
+          description: `Welcome back to Quick Quiz as ${userType}!`
         });
         navigate('/');
       } else {
@@ -67,11 +69,43 @@ const Login = () => {
       <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Login</CardTitle>
+            <CardTitle className="text-3xl font-bold">Login to Quick Quiz</CardTitle>
             <CardDescription>Enter your credentials to access your account</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Select Account Type</Label>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={setUserType}
+                  className="flex flex-col space-y-2 mt-2"
+                >
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="student" id="student" />
+                    <Label htmlFor="student" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Student</div>
+                      <div className="text-xs text-muted-foreground">Access to join and create tests</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="teacher" id="teacher" />
+                    <Label htmlFor="teacher" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Teacher</div>
+                      <div className="text-xs text-muted-foreground">Access to create, modify and deploy tests</div>
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                    <RadioGroupItem value="organization" id="organization" />
+                    <Label htmlFor="organization" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Organization</div>
+                      <div className="text-xs text-muted-foreground">Full access to all services</div>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input 
