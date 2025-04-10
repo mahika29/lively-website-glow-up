@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -33,32 +34,12 @@ const TakeQuizPage = () => {
   const [username, setUsername] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   
-  // If no quizId is provided, show a list of all quizzes
-  if (!quizId) {
-    return <QuizList />;
-  }
-  
-  // If quiz is not found, show error
-  if (!quiz) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
-            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/take">View All Quizzes</Link>
-            </Button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-  
   // Define handleSubmitQuiz before it's used in useEffect
+  // IMPORTANT: Move the useCallback outside of any conditional blocks
   const handleSubmitQuiz = useCallback(() => {
+    // Make sure quiz is defined before using it
+    if (!quiz) return;
+    
     // Check if there are any unanswered questions
     const unansweredCount = selectedAnswers.filter(a => a === -1).length;
     
@@ -91,6 +72,30 @@ const TakeQuizPage = () => {
       description: `Your score: ${calculatedScore}%. You got ${correctAnswers} out of ${quiz.questions.length} questions correct.`,
     });
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast]);
+  
+  // If no quizId is provided, show a list of all quizzes
+  if (!quizId) {
+    return <QuizList />;
+  }
+  
+  // If quiz is not found, show error
+  if (!quiz) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
+            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
+            <Button asChild>
+              <Link to="/take">View All Quizzes</Link>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   // Load saved progress when the component mounts
   useEffect(() => {
