@@ -1,12 +1,15 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, BookOpen, PenLine } from 'lucide-react';
+import { Menu, X, BookOpen, PenLine, Share2, Code } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useAuth } from '@/contexts/AuthContext';
+import UserProfileMenu from '@/components/UserProfileMenu';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
   
   const isActivePath = (path: string) => {
     return location.pathname === path;
@@ -38,11 +41,14 @@ const Navbar = () => {
             <Link to="/leaderboard" className={`py-2 px-3 rounded-md text-sm font-medium ${isActivePath('/leaderboard') ? 'text-quiz-primary' : 'text-gray-700 hover:text-quiz-primary'}`}>
               Leaderboard
             </Link>
-            <Button className="ml-4">Sign In</Button>
+            <UserProfileMenu />
           </div>
           
           {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden">
+            <div className="mr-2">
+              <UserProfileMenu />
+            </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
@@ -86,7 +92,6 @@ const Navbar = () => {
             >
               Leaderboard
             </Link>
-            <Button className="mt-2 w-full">Sign In</Button>
           </div>
         </div>
       )}

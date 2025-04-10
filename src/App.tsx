@@ -19,6 +19,8 @@ import Register from "./pages/Auth/Register";
 import Profile from "./pages/Profile";
 import Flashcards from "./pages/Flashcards";
 import Categories from "./pages/Categories";
+import QuizExam from "./pages/QuizExam";
+import ShareQuiz from "./pages/ShareQuiz";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -44,22 +46,46 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/take" element={<TakeQuiz />} />
-                <Route path="/take/:quizId" element={<TakeQuiz />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/flashcards" element={<Flashcards />} />
-                <Route path="/flashcards/:quizId" element={<Flashcards />} />
                 <Route path="/categories" element={<Categories />} />
 
-                {/* Protected routes */}
+                {/* Protected routes with user verification */}
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Protected routes with user-specific access */}
                 <Route path="/create" element={
                   <ProtectedRoute>
                     <CreateQuiz />
                   </ProtectedRoute>
                 } />
-                <Route path="/profile" element={
+                
+                <Route path="/take" element={<TakeQuiz />} />
+                <Route path="/take/:quizId" element={<TakeQuiz />} />
+                
+                <Route path="/share/:quizId" element={
                   <ProtectedRoute>
-                    <Profile />
+                    <ShareQuiz />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/flashcards" element={
+                  <ProtectedRoute>
+                    <Flashcards />
+                  </ProtectedRoute>
+                } />
+                <Route path="/flashcards/:quizId" element={
+                  <ProtectedRoute>
+                    <Flashcards />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/exam/:quizId" element={
+                  <ProtectedRoute>
+                    <QuizExam />
                   </ProtectedRoute>
                 } />
 

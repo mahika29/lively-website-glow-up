@@ -8,6 +8,9 @@ import {
   BookOpen,
   Trophy,
   BarChart,
+  Share2,
+  Code,
+  Users,
 } from "lucide-react";
 
 import {
@@ -73,6 +76,8 @@ const UserProfileMenu = () => {
             </Link>
           </DropdownMenuItem>
           
+          {/* Quick Access Menu Items based on user type */}
+          
           {user.userType === 'student' && (
             <DropdownMenuItem asChild>
               <Link to="/take" className="flex cursor-pointer items-center">
@@ -83,10 +88,28 @@ const UserProfileMenu = () => {
           )}
           
           {(user.userType === 'teacher' || user.userType === 'organization') && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to="/create" className="flex cursor-pointer items-center">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <span>Create Quiz</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link to="/create" className="flex cursor-pointer items-center">
+                  <Share2 className="mr-2 h-4 w-4" />
+                  <span>My Quizzes</span>
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+          
+          {user.userType === 'teacher' && (
             <DropdownMenuItem asChild>
               <Link to="/create" className="flex cursor-pointer items-center">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Create Quiz</span>
+                <Users className="mr-2 h-4 w-4" />
+                <span>Manage Classes</span>
               </Link>
             </DropdownMenuItem>
           )}
