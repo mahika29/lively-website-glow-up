@@ -202,36 +202,36 @@ const Index = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Users Say</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">What Our Users Say</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Join thousands of teachers and students who love using Quizzy.
+              Join thousands of students and professors who love using Quizzy.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "Quizzy has revolutionized how I create and administer tests. My students love the interactive format!",
-                author: "Sarah Johnson",
-                role: "High School Teacher",
+                quote: "Quizzy has transformed how I conduct semester exams. The analytics help me identify areas where students need more support.",
+                author: "Dr. Priya Sharma",
+                role: "Professor, Delhi University",
                 avatar: "https://randomuser.me/api/portraits/women/32.jpg"
               },
               {
-                quote: "The instant feedback helps me understand where I need to improve. Much more engaging than traditional quizzes.",
-                author: "Michael Chen",
-                role: "University Student",
+                quote: "The practice quizzes helped me prepare better for my engineering exams. The instant feedback is really helpful!",
+                author: "Rahul Patel",
+                role: "B.Tech Student, IIT Bombay",
                 avatar: "https://randomuser.me/api/portraits/men/44.jpg"
               },
               {
-                quote: "As a school administrator, I appreciate the analytics that help us track student progress across different subjects.",
-                author: "David Rodriguez",
-                role: "School Principal",
+                quote: "As a college administrator, I appreciate how easy it is to manage multiple class assessments and track student progress.",
+                author: "Prof. Rajesh Kumar",
+                role: "HOD, VIT Vellore",
                 avatar: "https://randomuser.me/api/portraits/men/67.jpg"
               }
             ].map((testimonial, i) => (
               <div key={i} className="bg-gray-50 rounded-xl p-6 shadow-sm border relative">
                 <div className="text-3xl text-quiz-primary absolute top-4 left-4 opacity-20">"</div>
-                <p className="text-gray-700 mb-6 pt-6 relative z-10">
+                <p className="text-gray-800 mb-6 pt-6 relative z-10">
                   {testimonial.quote}
                 </p>
                 <div className="flex items-center">
@@ -241,8 +241,8 @@ const Index = () => {
                     className="w-12 h-12 rounded-full mr-4"
                   />
                   <div>
-                    <div className="font-medium">{testimonial.author}</div>
-                    <div className="text-sm text-gray-500">{testimonial.role}</div>
+                    <div className="font-medium text-gray-900">{testimonial.author}</div>
+                    <div className="text-sm text-gray-600">{testimonial.role}</div>
                   </div>
                 </div>
               </div>
