@@ -55,7 +55,15 @@ const Register = () => {
           title: "Registration successful",
           description: `Welcome to Quick Quiz! You're now logged in as a ${userType}.`
         });
-        navigate('/');
+        
+        // Navigate based on user type for quicker access
+        if (userType === 'student') {
+          navigate('/take');
+        } else if (userType === 'teacher') {
+          navigate('/create');
+        } else {
+          navigate('/');
+        }
       } else {
         toast({
           title: "Registration failed",
@@ -77,10 +85,10 @@ const Register = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4">
-        <Card className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md glass-card">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
+            <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Create Account</CardTitle>
             <CardDescription>Register for Quick Quiz</CardDescription>
           </CardHeader>
           <form onSubmit={handleRegister}>
@@ -92,6 +100,7 @@ const Register = () => {
                   value={name} 
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
+                  className="bg-white/50 dark:bg-gray-800/50"
                   required
                 />
               </div>
@@ -102,7 +111,7 @@ const Register = () => {
                   onValueChange={setUserType}
                   className="flex flex-col space-y-2 mt-2"
                 >
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="student" id="reg-student" />
                     <Label htmlFor="reg-student" className="flex-1 cursor-pointer">
                       <div className="font-medium">Student</div>
@@ -110,7 +119,7 @@ const Register = () => {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="teacher" id="reg-teacher" />
                     <Label htmlFor="reg-teacher" className="flex-1 cursor-pointer">
                       <div className="font-medium">Teacher</div>
@@ -118,7 +127,7 @@ const Register = () => {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="organization" id="reg-organization" />
                     <Label htmlFor="reg-organization" className="flex-1 cursor-pointer">
                       <div className="font-medium">Organization</div>
@@ -135,6 +144,7 @@ const Register = () => {
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
+                  className="bg-white/50 dark:bg-gray-800/50"
                   required
                 />
               </div>
@@ -147,6 +157,7 @@ const Register = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
+                    className="bg-white/50 dark:bg-gray-800/50"
                     required
                     minLength={6}
                   />
@@ -169,6 +180,7 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
+                  className="bg-white/50 dark:bg-gray-800/50"
                   required
                   minLength={6}
                 />
@@ -177,14 +189,14 @@ const Register = () => {
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full bg-quiz-primary hover:bg-quiz-accent"
+                className="w-full gradient-button"
                 disabled={isRegistering}
               >
                 {isRegistering ? 'Creating account...' : 'Create account'} {!isRegistering && <UserPlus className="ml-2 h-4 w-4" />}
               </Button>
               <div className="text-center text-sm">
                 Already have an account?{' '}
-                <Link to="/login" className="text-quiz-primary hover:underline font-medium">
+                <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                   Log in
                 </Link>
               </div>

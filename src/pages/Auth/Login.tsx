@@ -44,7 +44,15 @@ const Login = () => {
           title: "Login successful",
           description: `Welcome back to Quick Quiz as ${userType}!`
         });
-        navigate('/');
+        
+        // Navigate based on user type for quicker access
+        if (userType === 'student') {
+          navigate('/take');
+        } else if (userType === 'teacher') {
+          navigate('/create');
+        } else {
+          navigate('/');
+        }
       } else {
         toast({
           title: "Login failed",
@@ -66,10 +74,10 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4">
-        <Card className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md glass-card">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Login to Quick Quiz</CardTitle>
+            <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Login to Quick Quiz</CardTitle>
             <CardDescription>Enter your credentials to access your account</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
@@ -81,7 +89,7 @@ const Login = () => {
                   onValueChange={setUserType}
                   className="flex flex-col space-y-2 mt-2"
                 >
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="student" id="student" />
                     <Label htmlFor="student" className="flex-1 cursor-pointer">
                       <div className="font-medium">Student</div>
@@ -89,7 +97,7 @@ const Login = () => {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="teacher" id="teacher" />
                     <Label htmlFor="teacher" className="flex-1 cursor-pointer">
                       <div className="font-medium">Teacher</div>
@@ -97,7 +105,7 @@ const Login = () => {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2 p-2 border rounded-md">
+                  <div className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <RadioGroupItem value="organization" id="organization" />
                     <Label htmlFor="organization" className="flex-1 cursor-pointer">
                       <div className="font-medium">Organization</div>
@@ -114,6 +122,7 @@ const Login = () => {
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
+                  className="bg-white/50 dark:bg-gray-800/50"
                   required
                 />
               </div>
@@ -126,6 +135,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
+                    className="bg-white/50 dark:bg-gray-800/50"
                     required
                   />
                   <Button
@@ -139,7 +149,7 @@ const Login = () => {
                   </Button>
                 </div>
                 <div className="text-sm text-right">
-                  <Link to="/forgot-password" className="text-quiz-primary hover:underline">
+                  <Link to="/forgot-password" className="text-indigo-600 dark:text-indigo-400 hover:underline">
                     Forgot password?
                   </Link>
                 </div>
@@ -148,14 +158,14 @@ const Login = () => {
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full bg-quiz-primary hover:bg-quiz-accent"
+                className="w-full gradient-button"
                 disabled={isLoggingIn}
               >
                 {isLoggingIn ? 'Logging in...' : 'Log in'} {!isLoggingIn && <LogIn className="ml-2 h-4 w-4" />}
               </Button>
               <div className="text-center text-sm">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-quiz-primary hover:underline font-medium">
+                <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                   Register
                 </Link>
               </div>

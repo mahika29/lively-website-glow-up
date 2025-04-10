@@ -1,20 +1,13 @@
 
 import { Link } from 'react-router-dom';
 import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
   LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
   PlusCircle,
   Settings,
   User,
-  UserPlus,
-  Users,
+  BookOpen,
+  Trophy,
+  BarChart,
 } from "lucide-react";
 
 import {
@@ -23,17 +16,13 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
 
 const UserProfileMenu = () => {
   const { user, logout } = useAuth();
@@ -44,7 +33,7 @@ const UserProfileMenu = () => {
         <Button variant="ghost" asChild>
           <Link to="/login">Log in</Link>
         </Button>
-        <Button asChild>
+        <Button className="gradient-button" asChild>
           <Link to="/register">Sign up</Link>
         </Button>
       </div>
@@ -68,37 +57,65 @@ const UserProfileMenu = () => {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            <div className="mt-2">
+              <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20 text-primary">
+                {user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}
+              </Badge>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/profile">
+            <Link to="/profile" className="flex cursor-pointer items-center">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
+          
+          {user.userType === 'student' && (
+            <DropdownMenuItem asChild>
+              <Link to="/take" className="flex cursor-pointer items-center">
+                <BookOpen className="mr-2 h-4 w-4" />
+                <span>Take Quiz</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          
+          {(user.userType === 'teacher' || user.userType === 'organization') && (
+            <DropdownMenuItem asChild>
+              <Link to="/create" className="flex cursor-pointer items-center">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span>Create Quiz</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          
           <DropdownMenuItem asChild>
-            <Link to="/create">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Create Quiz</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/leaderboard">
-              <Users className="mr-2 h-4 w-4" />
+            <Link to="/leaderboard" className="flex cursor-pointer items-center">
+              <Trophy className="mr-2 h-4 w-4" />
               <span>Leaderboard</span>
             </Link>
           </DropdownMenuItem>
+          
+          {user.userType === 'organization' && (
+            <DropdownMenuItem asChild>
+              <Link to="/analytics" className="flex cursor-pointer items-center">
+                <BarChart className="mr-2 h-4 w-4" />
+                <span>Analytics</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          
           <DropdownMenuItem asChild>
-            <Link to="/settings">
+            <Link to="/settings" className="flex cursor-pointer items-center">
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} className="text-red-500 focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
