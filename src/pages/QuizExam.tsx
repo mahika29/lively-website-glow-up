@@ -23,9 +23,6 @@ const QuizExam = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Find the quiz by ID
-  const quiz = quizzes.find(q => q.id === quizId);
-  
   // State for quiz taking
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
@@ -37,6 +34,15 @@ const QuizExam = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(true);
+  const [quiz, setQuiz] = useState<Quiz | undefined>(undefined);
+  
+  // Find the quiz by ID
+  useEffect(() => {
+    if (quizId) {
+      const foundQuiz = quizzes.find(q => q.id === quizId);
+      setQuiz(foundQuiz);
+    }
+  }, [quizId]);
   
   // Handle fullscreen functionality
   const toggleFullscreen = useCallback(() => {
@@ -77,7 +83,7 @@ const QuizExam = () => {
     };
   }, [quizSubmitted, showInfoDialog]);
   
-  // Define handleSubmitQuiz before it's used in useEffect
+  // Define handleSubmitQuiz - MUST be defined before it's used in useEffect
   const handleSubmitQuiz = useCallback(() => {
     // Make sure quiz is defined before using it
     if (!quiz) return;
@@ -126,7 +132,7 @@ const QuizExam = () => {
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast, user]);
   
   // If quiz is not found, show error
-  if (!quiz) {
+  if (!quiz && quizId) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="text-center max-w-md p-8 bg-white rounded-lg shadow-md">
@@ -141,6 +147,8 @@ const QuizExam = () => {
   
   // Start the exam in fullscreen mode
   const startExam = () => {
+    if (!quiz) return;
+    
     setShowInfoDialog(false);
     toggleFullscreen();
     
@@ -159,7 +167,7 @@ const QuizExam = () => {
   
   // Initialize the timer when the component mounts
   useEffect(() => {
-    if (!quizSubmitted && !showInfoDialog && quiz.timeLimit > 0) {
+    if (!quizSubmitted && !showInfoDialog && quiz && quiz.timeLimit > 0) {
       // Convert minutes to seconds
       setTimeRemaining(quiz.timeLimit * 60);
       
@@ -179,7 +187,7 @@ const QuizExam = () => {
       // Clean up on component unmount
       return () => clearInterval(timer);
     }
-  }, [quizSubmitted, quiz.timeLimit, handleSubmitQuiz, showInfoDialog]);
+  }, [quizSubmitted, showInfoDialog, quiz, handleSubmitQuiz]);
   
   // Format time remaining as MM:SS
   const formatTime = (seconds: number | null) => {
@@ -200,7 +208,7 @@ const QuizExam = () => {
   
   // Navigate to the next question
   const goToNextQuestion = () => {
-    if (currentQuestionIndex < quiz.questions.length - 1) {
+    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -211,6 +219,11 @@ const QuizExam = () => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
+  
+  // Null check for quiz
+  if (!quiz) {
+    return <div className="flex items-center justify-center min-h-screen">Loading exam...</div>;
+  }
   
   // Calculate progress percentage
   const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;

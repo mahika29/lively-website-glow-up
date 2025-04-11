@@ -40,30 +40,7 @@ const TakeQuizPage = () => {
     }
   }, [quizId]);
   
-  // If no quizId is present, return the QuizList component
-  if (!quizId) {
-    return <QuizList />;
-  }
-  
-  // If quiz not found and we've already checked, show error
-  if (!quiz && quizId) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
-            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/take">View All Quizzes</Link>
-            </Button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-  
+  // Define handleSubmitQuiz at the component level - NOT conditionally
   const handleSubmitQuiz = useCallback(() => {
     if (!quiz) return;
     
@@ -95,6 +72,30 @@ const TakeQuizPage = () => {
       description: `Your score: ${calculatedScore}%. You got ${correctAnswers} out of ${quiz.questions.length} questions correct.`,
     });
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast]);
+  
+  // If no quizId is present, return the QuizList component
+  if (!quizId) {
+    return <QuizList />;
+  }
+  
+  // If quiz not found and we've already checked, show error
+  if (!quiz && quizId) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
+            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
+            <Button asChild>
+              <Link to="/take">View All Quizzes</Link>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   // Initialize answers array and restore progress
   useEffect(() => {
@@ -199,9 +200,9 @@ const TakeQuizPage = () => {
     navigate('/leaderboard');
   };
   
-  // Make sure quiz is defined before accessing properties
+  // Quiz is null safety check - return an early loading state
   if (!quiz) {
-    return null; // Return early while loading
+    return <div className="flex items-center justify-center min-h-screen">Loading quiz...</div>;
   }
   
   const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
