@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -21,8 +22,7 @@ const TakeQuizPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const quiz = quizzes.find(q => q.id === quizId);
-  
+  const [quiz, setQuiz] = useState<Quiz | undefined>(undefined);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -31,6 +31,38 @@ const TakeQuizPage = () => {
   const [score, setScore] = useState<number | null>(null);
   const [username, setUsername] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
+  
+  // Initialize quiz from params first
+  useEffect(() => {
+    if (quizId) {
+      const foundQuiz = quizzes.find(q => q.id === quizId);
+      setQuiz(foundQuiz);
+    }
+  }, [quizId]);
+  
+  // If no quizId is present, return the QuizList component
+  if (!quizId) {
+    return <QuizList />;
+  }
+  
+  // If quiz not found and we've already checked, show error
+  if (!quiz && quizId) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
+            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
+            <Button asChild>
+              <Link to="/take">View All Quizzes</Link>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   const handleSubmitQuiz = useCallback(() => {
     if (!quiz) return;
@@ -64,28 +96,7 @@ const TakeQuizPage = () => {
     });
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast]);
   
-  if (!quizId) {
-    return <QuizList />;
-  }
-  
-  if (!quiz) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-red-500 mb-4">Quiz Not Found</h1>
-            <p className="text-gray-600 mb-6">The quiz you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/take">View All Quizzes</Link>
-            </Button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-  
+  // Initialize answers array and restore progress
   useEffect(() => {
     if (!quizSubmitted && quiz) {
       const newAnswers = new Array(quiz.questions.length).fill(-1);
@@ -105,8 +116,9 @@ const TakeQuizPage = () => {
     }
   }, [quiz, quizSubmitted, toast]);
   
+  // Setup timer
   useEffect(() => {
-    if (!quizSubmitted && quiz.timeLimit > 0) {
+    if (!quizSubmitted && quiz && quiz.timeLimit > 0) {
       setTimeRemaining(quiz.timeLimit * 60);
       
       const timer = setInterval(() => {
@@ -122,8 +134,9 @@ const TakeQuizPage = () => {
       
       return () => clearInterval(timer);
     }
-  }, [quizSubmitted, quiz.timeLimit, handleSubmitQuiz]);
+  }, [quizSubmitted, quiz, handleSubmitQuiz]);
   
+  // Save progress
   useEffect(() => {
     if (!quizSubmitted && quiz) {
       saveQuizProgress(quiz.id, selectedAnswers, currentQuestionIndex);
@@ -146,7 +159,7 @@ const TakeQuizPage = () => {
   };
   
   const goToNextQuestion = () => {
-    if (currentQuestionIndex < quiz.questions.length - 1) {
+    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -157,14 +170,14 @@ const TakeQuizPage = () => {
     }
   };
   
-  const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
-  
   const handleRevealAnswers = () => {
     setAnswersRevealed(true);
     setCurrentQuestionIndex(0);
   };
   
   const handleSaveResult = () => {
+    if (!quiz) return;
+    
     if (!username.trim()) {
       toast({
         title: "Username Required",
@@ -186,8 +199,13 @@ const TakeQuizPage = () => {
     navigate('/leaderboard');
   };
   
-  const currentQuestion = quiz.questions[currentQuestionIndex];
+  // Make sure quiz is defined before accessing properties
+  if (!quiz) {
+    return null; // Return early while loading
+  }
   
+  const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
+  const currentQuestion = quiz.questions[currentQuestionIndex];
   const isCurrentQuestionAnswered = selectedAnswers[currentQuestionIndex] !== -1;
   
   if (quizSubmitted && !answersRevealed) {
