@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings } from 'lucide-react';
@@ -11,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const location = useLocation();
   
@@ -111,7 +110,7 @@ const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => signOut()}
+                      onClick={() => logout()}
                       className="cursor-pointer text-red-600 flex items-center"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -149,7 +148,6 @@ const Navbar = () => {
         </div>
       </div>
       
-      {/* Mobile menu */}
       {isMobile && isOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="pt-2 pb-4 space-y-1 px-4">
