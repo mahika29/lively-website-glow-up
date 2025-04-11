@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery();
   const location = useLocation();
   
   const isActive = (path: string) => {

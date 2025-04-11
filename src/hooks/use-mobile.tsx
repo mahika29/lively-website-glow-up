@@ -19,8 +19,7 @@ export function useIsMobile() {
   return !!isMobile
 }
 
-// Add the useMediaQuery function that returns the useIsMobile hook 
-// to maintain compatibility with existing code
+// Add the useMediaQuery function that returns a boolean indicating if the screen is mobile size
 export function useMediaQuery() {
   return useIsMobile()
 }
