@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { quizzes } from '@/data/quizzes';
+import { generateShareCode, storeShareCode } from '@/utils/shareCodeUtils';
 
 const ShareQuiz = () => {
   const { quizId } = useParams();
@@ -24,24 +25,11 @@ const ShareQuiz = () => {
     if (quiz) {
       const code = generateShareCode(quiz.id);
       setShareCode(code);
+      
+      // Store the share code in localStorage
+      storeShareCode(quiz.id, code);
     }
   }, [quiz]);
-  
-  // Generate a 6-character alphanumeric share code
-  const generateShareCode = (id: string) => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    
-    // Use the quiz id as part of the seed for consistency
-    const seed = parseInt(id, 10) || Date.now();
-    
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = (seed + i * 17) % chars.length;
-      code += chars[randomIndex];
-    }
-    
-    return code;
-  };
   
   // Handle copy to clipboard functionality
   const handleCopy = (text: string, type: string) => {
@@ -155,6 +143,12 @@ const ShareQuiz = () => {
                       {copied === 'Code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
+                  
+                  <div className="mt-4 bg-blue-50 p-3 rounded-md border border-blue-100">
+                    <p className="text-sm text-blue-800">
+                      <strong>Tip:</strong> When students enter this code on the Take Quiz page, they'll be directed to your quiz automatically.
+                    </p>
+                  </div>
                 </CardContent>
               </TabsContent>
               
@@ -177,6 +171,12 @@ const ShareQuiz = () => {
                     >
                       {copied === 'Exam URL' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
+                  </div>
+                  
+                  <div className="mt-4 bg-amber-50 p-3 rounded-md border border-amber-100">
+                    <p className="text-sm text-amber-800">
+                      <strong>Important:</strong> Exam mode is designed for proctored assessments. Students won't be able to exit fullscreen until they complete the quiz or you manually end the session.
+                    </p>
                   </div>
                 </CardContent>
               </TabsContent>

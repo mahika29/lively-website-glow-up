@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Trophy, Medal, Clock, Search, ArrowUp, ArrowDown, Filter } from 'lucide-react';
+import { Trophy, Medal, Clock, Search, ArrowUp, ArrowDown, Filter, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import {
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { quizzes, leaderboard, LeaderboardEntry } from '@/data/quizzes';
@@ -23,6 +24,7 @@ const Leaderboard = () => {
     direction: 'asc' | 'desc';
   }>({ key: 'score', direction: 'desc' });
   const [topPerformers, setTopPerformers] = useState<LeaderboardEntry[]>([]);
+  const { toast } = useToast();
 
   // Filter leaderboard entries based on search query and selected quiz
   useEffect(() => {
@@ -100,14 +102,62 @@ const Leaderboard = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
+  // Export results to CSV
+  const exportToCSV = () => {
+    // Create CSV header
+    const headers = ["Rank", "Username", "Quiz", "Score (%)", "Time Taken", "Date Completed"];
+    
+    // Create CSV rows
+    const rows = filteredLeaderboard.map((entry, index) => {
+      const quiz = quizzes.find(q => q.id === entry.quizId);
+      return [
+        index + 1,
+        entry.username,
+        quiz?.title || "Unknown Quiz",
+        entry.score,
+        formatTime(entry.timeTaken),
+        formatDate(entry.completedAt)
+      ];
+    });
+    
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+    
+    // Create a blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `leaderboard_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export successful",
+      description: "Leaderboard data has been exported to CSV",
+    });
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <h1 className="text-3xl font-bold mb-2">Leaderboard</h1>
-            <p className="text-gray-600">See who's topping the charts and how you compare.</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Leaderboard</h1>
+                <p className="text-gray-600">See who's topping the charts and how you compare.</p>
+              </div>
+              <Button onClick={exportToCSV} className="flex items-center gap-2">
+                <FileText size={16} />
+                <span>Export Results</span>
+              </Button>
+            </div>
           </div>
           
           {/* Top Performers */}

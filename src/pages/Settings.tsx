@@ -10,14 +10,18 @@ import {
   Info, 
   Bell, 
   Globe, 
-  Database
+  Database,
+  Upload,
+  Download,
+  FileText
 } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardFooter 
 } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,6 +31,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { importQuizzesFromCSV, importResultsFromCSV } from '@/data/quizUtils';
 
 const Settings = () => {
   const { toast } = useToast();
@@ -56,6 +61,152 @@ const Settings = () => {
       
       return newSettings;
     });
+  };
+
+  // Handle importing from Excel
+  const handleImportFromExcel = () => {
+    // Create a file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    
+    fileInput.addEventListener('change', (event) => {
+      const target = event.target as HTMLInputElement;
+      if (!target.files || target.files.length === 0) return;
+      
+      const file = target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const csvContent = e.target?.result as string;
+        
+        try {
+          const importedQuizzes = importQuizzesFromCSV(csvContent);
+          
+          console.log('Imported quizzes:', importedQuizzes);
+          
+          toast({
+            title: "Import successful",
+            description: `Imported ${importedQuizzes.length} quizzes from CSV file.`,
+          });
+        } catch (error) {
+          console.error('Import error:', error);
+          
+          toast({
+            title: "Import failed",
+            description: "There was an error importing the CSV file.",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      reader.readAsText(file);
+    });
+    
+    // Trigger file selection
+    fileInput.click();
+  };
+  
+  // Handle importing results from Excel
+  const handleImportResults = () => {
+    // Create a file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    
+    fileInput.addEventListener('change', (event) => {
+      const target = event.target as HTMLInputElement;
+      if (!target.files || target.files.length === 0) return;
+      
+      const file = target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const csvContent = e.target?.result as string;
+        
+        try {
+          const importedResults = importResultsFromCSV(csvContent);
+          
+          console.log('Imported results:', importedResults);
+          
+          toast({
+            title: "Import successful",
+            description: `Imported ${importedResults.length} quiz results from CSV file.`,
+          });
+        } catch (error) {
+          console.error('Import error:', error);
+          
+          toast({
+            title: "Import failed",
+            description: "There was an error importing the CSV file.",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      reader.readAsText(file);
+    });
+    
+    // Trigger file selection
+    fileInput.click();
+  };
+  
+  // Handle exporting results
+  const handleExportResults = () => {
+    // In a real app, you would fetch actual results from storage/database
+    const resultsFromStorage = localStorage.getItem('quiz_results');
+    
+    if (!resultsFromStorage) {
+      toast({
+        title: "No results to export",
+        description: "There are no quiz results available to export.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      const results = JSON.parse(resultsFromStorage);
+      
+      // Create CSV content
+      const headers = ["ID", "Quiz ID", "Username", "Score", "Time Taken", "Completed At"];
+      const rows = results.map((result: any) => [
+        result.id,
+        result.quizId,
+        result.username,
+        result.score,
+        result.timeTaken,
+        result.completedAt
+      ]);
+      
+      const csvContent = [
+        headers.join(","),
+        ...rows.map((row: any[]) => row.join(","))
+      ].join("\n");
+      
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `quiz_results_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Export successful",
+        description: "Quiz results have been exported to CSV file.",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the quiz results.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Handle save settings
@@ -139,7 +290,7 @@ const Settings = () => {
                   <CardHeader>
                     <CardTitle>Appearance</CardTitle>
                     <CardDescription>
-                      Customize how Quizzy looks for you. Changes will apply to this browser only.
+                      Customize how Quick Quiz looks for you. Changes will apply to this browser only.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -186,7 +337,7 @@ const Settings = () => {
                             <span className="font-medium">Share activity data</span>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Allow your quiz activities to be visible to teachers
+                            Allow your quiz activities to be visible to professors
                           </p>
                         </div>
                         <Switch 
@@ -317,11 +468,44 @@ const Settings = () => {
                         Import quiz questions from Excel or export quiz results to Excel
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <Button variant="outline">
-                          Import from Excel
+                        <Button 
+                          variant="outline" 
+                          onClick={handleImportFromExcel}
+                          className="flex gap-2 items-center"
+                        >
+                          <Upload size={16} />
+                          Import Quizzes
                         </Button>
-                        <Button>
-                          Export Results to Excel
+                        <Button
+                          onClick={handleExportResults}
+                          className="flex gap-2 items-center"
+                        >
+                          <Download size={16} />
+                          Export Results
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-md">
+                      <h3 className="text-lg font-medium mb-2">Results Management</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Import external quiz results or manage existing result data
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button 
+                          variant="outline" 
+                          onClick={handleImportResults}
+                          className="flex gap-2 items-center"
+                        >
+                          <Upload size={16} />
+                          Import Results
+                        </Button>
+                        <Button
+                          onClick={() => navigate('/leaderboard')}
+                          className="flex gap-2 items-center"
+                        >
+                          <FileText size={16} />
+                          View Leaderboard
                         </Button>
                       </div>
                     </div>
@@ -334,7 +518,7 @@ const Settings = () => {
                   <CardHeader>
                     <CardTitle>Help & Support</CardTitle>
                     <CardDescription>
-                      Get help with using Quizzy
+                      Get help with using Quick Quiz
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -364,6 +548,39 @@ const Settings = () => {
                       </div>
                     </div>
                   </CardContent>
+                </Card>
+                
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Database Connection</CardTitle>
+                    <CardDescription>
+                      Information about connecting to external databases
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p>
+                        For large-scale quiz management or educational institutions, we recommend setting up a database connection. 
+                        This will enable more robust data storage, user management, and analytics capabilities.
+                      </p>
+                      
+                      <div className="bg-gray-100 p-4 rounded-md text-sm">
+                        <h4 className="font-medium mb-2">Supported Database Types:</h4>
+                        <ul className="list-disc pl-5 space-y-1">
+                          <li>MySQL</li>
+                          <li>PostgreSQL</li>
+                          <li>MongoDB</li>
+                          <li>Firebase</li>
+                          <li>Supabase</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full">
+                      Setup Database Connection
+                    </Button>
+                  </CardFooter>
                 </Card>
               </TabsContent>
             </Tabs>
