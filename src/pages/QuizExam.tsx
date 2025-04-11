@@ -36,15 +36,7 @@ const QuizExam = () => {
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [quiz, setQuiz] = useState<Quiz | undefined>(undefined);
   
-  // Find the quiz by ID
-  useEffect(() => {
-    if (quizId) {
-      const foundQuiz = quizzes.find(q => q.id === quizId);
-      setQuiz(foundQuiz);
-    }
-  }, [quizId]);
-  
-  // Handle fullscreen functionality
+  // Define all callbacks at the component level - ensure consistent hook ordering
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
@@ -65,25 +57,6 @@ const QuizExam = () => {
     }
   }, [toast]);
   
-  // Monitor fullscreen changes
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-      
-      // If exiting fullscreen and quiz not submitted, show warning
-      if (!document.fullscreenElement && !quizSubmitted && !showInfoDialog) {
-        setShowExitDialog(true);
-      }
-    };
-    
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, [quizSubmitted, showInfoDialog]);
-  
-  // Define handleSubmitQuiz - MUST be defined before it's used in useEffect
   const handleSubmitQuiz = useCallback(() => {
     // Make sure quiz is defined before using it
     if (!quiz) return;
@@ -131,22 +104,29 @@ const QuizExam = () => {
     }
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast, user]);
   
-  // If quiz is not found, show error
-  if (!quiz && quizId) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md p-8 bg-white rounded-lg shadow-md">
-          <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Exam Not Found</h1>
-          <p className="text-gray-600 mb-6">The exam you're looking for doesn't exist or has been removed.</p>
-          <Button onClick={() => navigate('/')}>Return Home</Button>
-        </div>
-      </div>
-    );
-  }
+  const handleSelectOption = useCallback((optionIndex: number) => {
+    if (quizSubmitted) return;
+    
+    setSelectedAnswers(prev => {
+      const newAnswers = [...prev];
+      newAnswers[currentQuestionIndex] = optionIndex;
+      return newAnswers;
+    });
+  }, [quizSubmitted, currentQuestionIndex]);
   
-  // Start the exam in fullscreen mode
-  const startExam = () => {
+  const goToNextQuestion = useCallback(() => {
+    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  }, [quiz, currentQuestionIndex]);
+  
+  const goToPreviousQuestion = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  }, [currentQuestionIndex]);
+  
+  const startExam = useCallback(() => {
     if (!quiz) return;
     
     setShowInfoDialog(false);
@@ -163,9 +143,35 @@ const QuizExam = () => {
     if (quiz.timeLimit > 0) {
       setTimeRemaining(quiz.timeLimit * 60);
     }
-  };
+  }, [quiz, toggleFullscreen]);
   
-  // Initialize the timer when the component mounts
+  // Find the quiz by ID
+  useEffect(() => {
+    if (quizId) {
+      const foundQuiz = quizzes.find(q => q.id === quizId);
+      setQuiz(foundQuiz);
+    }
+  }, [quizId]);
+  
+  // Monitor fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      
+      // If exiting fullscreen and quiz not submitted, show warning
+      if (!document.fullscreenElement && !quizSubmitted && !showInfoDialog) {
+        setShowExitDialog(true);
+      }
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, [quizSubmitted, showInfoDialog]);
+  
+  // Initialize the timer when needed
   useEffect(() => {
     if (!quizSubmitted && !showInfoDialog && quiz && quiz.timeLimit > 0) {
       // Convert minutes to seconds
@@ -197,28 +203,19 @@ const QuizExam = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Handle option selection
-  const handleSelectOption = (optionIndex: number) => {
-    if (quizSubmitted) return;
-    
-    const newAnswers = [...selectedAnswers];
-    newAnswers[currentQuestionIndex] = optionIndex;
-    setSelectedAnswers(newAnswers);
-  };
-  
-  // Navigate to the next question
-  const goToNextQuestion = () => {
-    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-  
-  // Navigate to the previous question
-  const goToPreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
+  // If quiz is not found, show error
+  if (!quiz && quizId) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md p-8 bg-white rounded-lg shadow-md">
+          <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
+          <h1 className="text-3xl font-bold text-red-500 mb-4">Exam Not Found</h1>
+          <p className="text-gray-600 mb-6">The exam you're looking for doesn't exist or has been removed.</p>
+          <Button onClick={() => navigate('/')}>Return Home</Button>
+        </div>
+      </div>
+    );
+  }
   
   // Null check for quiz
   if (!quiz) {
