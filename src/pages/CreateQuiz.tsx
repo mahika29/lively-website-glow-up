@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -15,8 +14,9 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { saveQuiz } from '@/utils/quizUtils';
+import { generateShareCode } from '@/utils/shareCodeUtils';
 
-// Define the question type
 interface QuestionData {
   id: number;
   question: string;
@@ -28,7 +28,6 @@ const CreateQuiz = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // State for quiz details
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -36,7 +35,6 @@ const CreateQuiz = () => {
   const [difficulty, setDifficulty] = useState('medium');
   const [tags, setTags] = useState('');
   
-  // State for questions
   const [questions, setQuestions] = useState<QuestionData[]>([
     {
       id: 1,
@@ -46,10 +44,8 @@ const CreateQuiz = () => {
     }
   ]);
   
-  // Current editing question index
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   
-  // Handle adding a new question
   const handleAddQuestion = () => {
     const newQuestion: QuestionData = {
       id: questions.length + 1,
@@ -61,14 +57,12 @@ const CreateQuiz = () => {
     setQuestions([...questions, newQuestion]);
     setCurrentQuestionIndex(questions.length);
     
-    // Show toast notification
     toast({
       title: "Question added",
       description: `Question ${questions.length + 1} has been added.`,
     });
   };
   
-  // Handle removing the current question
   const handleRemoveQuestion = () => {
     if (questions.length <= 1) {
       toast({
@@ -82,7 +76,6 @@ const CreateQuiz = () => {
     const newQuestions = questions.filter((_, index) => index !== currentQuestionIndex);
     setQuestions(newQuestions);
     
-    // Adjust current question index if needed
     if (currentQuestionIndex >= newQuestions.length) {
       setCurrentQuestionIndex(newQuestions.length - 1);
     }
@@ -93,44 +86,37 @@ const CreateQuiz = () => {
     });
   };
   
-  // Handle question text change
   const handleQuestionChange = (value: string) => {
     const updatedQuestions = [...questions];
     updatedQuestions[currentQuestionIndex].question = value;
     setQuestions(updatedQuestions);
   };
   
-  // Handle option text change
   const handleOptionChange = (optionIndex: number, value: string) => {
     const updatedQuestions = [...questions];
     updatedQuestions[currentQuestionIndex].options[optionIndex] = value;
     setQuestions(updatedQuestions);
   };
   
-  // Handle correct answer selection
   const handleCorrectAnswerChange = (value: number) => {
     const updatedQuestions = [...questions];
     updatedQuestions[currentQuestionIndex].correctAnswer = value;
     setQuestions(updatedQuestions);
   };
   
-  // Navigate to previous question
   const goToPreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
   
-  // Navigate to next question
   const goToNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
   
-  // Handle saving the quiz
   const handleSaveQuiz = () => {
-    // Validate quiz details
     if (!title.trim()) {
       toast({
         title: "Missing title",
@@ -140,7 +126,6 @@ const CreateQuiz = () => {
       return;
     }
     
-    // Validate questions
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
       
@@ -177,17 +162,31 @@ const CreateQuiz = () => {
       }
     }
     
-    // In a real app, you would save this data to a backend
-    // For now, we'll just simulate success
+    const quizData = {
+      title,
+      description,
+      category,
+      author: "Anonymous",
+      timeLimit,
+      difficulty,
+      tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      questions: questions.map(q => ({
+        id: q.id,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer || 0
+      }))
+    };
+    
+    const quizId = saveQuiz(quizData);
     
     toast({
       title: "Quiz saved successfully!",
       description: `Your quiz "${title}" has been created with ${questions.length} questions.`,
     });
     
-    // Navigate to the home page after a short delay
     setTimeout(() => {
-      navigate('/');
+      navigate(`/share/${quizId}`);
     }, 1500);
   };
   
@@ -205,7 +204,6 @@ const CreateQuiz = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Quiz Details */}
             <div className="md:col-span-1">
               <Card>
                 <CardContent className="pt-6">
@@ -326,7 +324,6 @@ const CreateQuiz = () => {
               </Card>
             </div>
             
-            {/* Question Editor */}
             <div className="md:col-span-2">
               <Card>
                 <CardContent className="pt-6">

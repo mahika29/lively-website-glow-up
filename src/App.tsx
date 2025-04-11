@@ -1,109 +1,39 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import CreateQuiz from './pages/CreateQuiz';
+import TakeQuiz from './pages/TakeQuiz';
+import Leaderboard from './pages/Leaderboard';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import ShareQuiz from './pages/ShareQuiz';
+import QuizExam from './pages/QuizExam';
+import JoinQuiz from './pages/JoinQuiz';
+import MongoDbIntegration from './pages/MongoDbIntegration';
 
-// Pages
-import Index from "./pages/Index";
-import CreateQuiz from "./pages/CreateQuiz";
-import TakeQuiz from "./pages/TakeQuiz";
-import Leaderboard from "./pages/Leaderboard";
-import NotFound from "./pages/NotFound";
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
-import Profile from "./pages/Profile";
-import Flashcards from "./pages/Flashcards";
-import Categories from "./pages/Categories";
-import QuizExam from "./pages/QuizExam";
-import ShareQuiz from "./pages/ShareQuiz";
-import Settings from "./pages/Settings";
-
-// Create a new QueryClient instance
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-const App = () => {
+const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/categories" element={<Categories />} />
-
-                {/* Protected routes with user verification */}
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } />
-                
-                {/* Protected routes with user-specific access */}
-                <Route path="/create" element={
-                  <ProtectedRoute>
-                    <CreateQuiz />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/take" element={<TakeQuiz />} />
-                <Route path="/take/:quizId" element={<TakeQuiz />} />
-                
-                <Route path="/share/:quizId" element={
-                  <ProtectedRoute>
-                    <ShareQuiz />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/flashcards" element={
-                  <ProtectedRoute>
-                    <Flashcards />
-                  </ProtectedRoute>
-                } />
-                <Route path="/flashcards/:quizId" element={
-                  <ProtectedRoute>
-                    <Flashcards />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/exam/:quizId" element={
-                  <ProtectedRoute>
-                    <QuizExam />
-                  </ProtectedRoute>
-                } />
-
-                {/* 404 route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create" element={<CreateQuiz />} />
+        <Route path="/take" element={<TakeQuiz />} />
+        <Route path="/take/:quizId" element={<TakeQuiz />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/share/:quizId" element={<ShareQuiz />} />
+        <Route path="/exam/:quizId" element={<QuizExam />} />
+        <Route path="/join" element={<JoinQuiz />} />
+        <Route path="/mongodb-integration" element={<MongoDbIntegration />} />
+      </Routes>
+    </Router>
   );
 };
 
 export default App;
+

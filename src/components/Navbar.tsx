@@ -185,6 +185,17 @@ const Navbar = () => {
               Take Quiz
             </Link>
             <Link 
+              to="/join" 
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive('/join') 
+                  ? 'bg-quiz-primary/10 text-quiz-primary' 
+                  : 'text-gray-800 hover:bg-gray-100'
+              }`}
+              onClick={() => setIsOpen(false)}
+            >
+              Join Quiz
+            </Link>
+            <Link 
               to="/leaderboard" 
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 isActive('/leaderboard') 

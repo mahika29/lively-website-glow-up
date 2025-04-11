@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -15,16 +14,15 @@ import {
   quizzes, Quiz, saveQuizProgress, 
   getQuizProgress, clearQuizProgress, saveQuizResult 
 } from '@/data/quizzes';
+import { getAllQuizzes } from '@/utils/quizUtils';
 
 const TakeQuizPage = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Find the quiz by ID
   const quiz = quizzes.find(q => q.id === quizId);
   
-  // State for quiz taking
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -34,13 +32,9 @@ const TakeQuizPage = () => {
   const [username, setUsername] = useState('');
   const [startTime, setStartTime] = useState<number | null>(null);
   
-  // Define handleSubmitQuiz before it's used in useEffect
-  // IMPORTANT: Move the useCallback outside of any conditional blocks
   const handleSubmitQuiz = useCallback(() => {
-    // Make sure quiz is defined before using it
     if (!quiz) return;
     
-    // Check if there are any unanswered questions
     const unansweredCount = selectedAnswers.filter(a => a === -1).length;
     
     if (unansweredCount > 0 && !quizSubmitted) {
@@ -52,7 +46,6 @@ const TakeQuizPage = () => {
       return;
     }
     
-    // Calculate score
     const correctAnswers = selectedAnswers.reduce((count, answer, index) => {
       return count + (answer === quiz.questions[index].correctAnswer ? 1 : 0);
     }, 0);
@@ -61,10 +54,8 @@ const TakeQuizPage = () => {
     setScore(calculatedScore);
     setQuizSubmitted(true);
     
-    // Calculate time taken in seconds
     const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 600;
     
-    // Clear progress since quiz is completed
     clearQuizProgress(quiz.id);
     
     toast({
@@ -73,12 +64,10 @@ const TakeQuizPage = () => {
     });
   }, [quiz, selectedAnswers, quizSubmitted, startTime, toast]);
   
-  // If no quizId is provided, show a list of all quizzes
   if (!quizId) {
     return <QuizList />;
   }
   
-  // If quiz is not found, show error
   if (!quiz) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -97,14 +86,11 @@ const TakeQuizPage = () => {
     );
   }
   
-  // Load saved progress when the component mounts
   useEffect(() => {
     if (!quizSubmitted && quiz) {
-      // Initialize selected answers array
       const newAnswers = new Array(quiz.questions.length).fill(-1);
       setSelectedAnswers(newAnswers);
       
-      // Check for saved progress
       const savedProgress = getQuizProgress(quiz.id);
       if (savedProgress) {
         toast({
@@ -115,23 +101,18 @@ const TakeQuizPage = () => {
         setCurrentQuestionIndex(savedProgress.currentQuestionIndex);
       }
       
-      // Set the start time
       setStartTime(Date.now());
     }
   }, [quiz, quizSubmitted, toast]);
   
-  // Initialize the timer when the component mounts
   useEffect(() => {
     if (!quizSubmitted && quiz.timeLimit > 0) {
-      // Convert minutes to seconds
       setTimeRemaining(quiz.timeLimit * 60);
       
-      // Start the timer
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev === null || prev <= 0) {
             clearInterval(timer);
-            // Handle quiz submission on timeout
             handleSubmitQuiz();
             return 0;
           }
@@ -139,19 +120,16 @@ const TakeQuizPage = () => {
         });
       }, 1000);
       
-      // Clean up on component unmount
       return () => clearInterval(timer);
     }
   }, [quizSubmitted, quiz.timeLimit, handleSubmitQuiz]);
   
-  // Save progress whenever selectedAnswers or currentQuestionIndex changes
   useEffect(() => {
     if (!quizSubmitted && quiz) {
       saveQuizProgress(quiz.id, selectedAnswers, currentQuestionIndex);
     }
   }, [selectedAnswers, currentQuestionIndex, quizSubmitted, quiz]);
   
-  // Format time remaining as MM:SS
   const formatTime = (seconds: number | null) => {
     if (seconds === null) return '00:00';
     const mins = Math.floor(seconds / 60);
@@ -159,7 +137,6 @@ const TakeQuizPage = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Handle option selection
   const handleSelectOption = (optionIndex: number) => {
     if (quizSubmitted) return;
     
@@ -168,30 +145,25 @@ const TakeQuizPage = () => {
     setSelectedAnswers(newAnswers);
   };
   
-  // Navigate to the next question
   const goToNextQuestion = () => {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
   
-  // Navigate to the previous question
   const goToPreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
   
-  // Calculate progress percentage
   const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
   
-  // Handle revealing answers
   const handleRevealAnswers = () => {
     setAnswersRevealed(true);
     setCurrentQuestionIndex(0);
   };
   
-  // Handle saving result to leaderboard
   const handleSaveResult = () => {
     if (!username.trim()) {
       toast({
@@ -214,13 +186,10 @@ const TakeQuizPage = () => {
     navigate('/leaderboard');
   };
   
-  // Get the current question
   const currentQuestion = quiz.questions[currentQuestionIndex];
   
-  // Determine if the current question has been answered
   const isCurrentQuestionAnswered = selectedAnswers[currentQuestionIndex] !== -1;
   
-  // Render quiz results
   if (quizSubmitted && !answersRevealed) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -331,7 +300,6 @@ const TakeQuizPage = () => {
             </div>
           </div>
           
-          {/* Progress and Timer */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <span>Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
@@ -462,8 +430,15 @@ const TakeQuizPage = () => {
   );
 };
 
-// Component to list all available quizzes
 const QuizList = () => {
+  const [availableQuizzes, setAvailableQuizzes] = useState<Quiz[]>([]);
+  
+  useEffect(() => {
+    const userQuizzes = getAllQuizzes();
+    const allQuizzes = [...quizzes, ...userQuizzes];
+    setAvailableQuizzes(allQuizzes);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -471,11 +446,14 @@ const QuizList = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
             <h1 className="text-3xl font-bold mb-2">Available Quizzes</h1>
-            <p className="text-gray-600">Choose a quiz to test your knowledge.</p>
+            <p className="text-gray-600">Choose a quiz to test your knowledge or join with a code.</p>
+            <Button asChild className="mt-4">
+              <Link to="/join">Join Quiz with Code</Link>
+            </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {quizzes.map((quiz) => (
+            {availableQuizzes.map((quiz) => (
               <Card 
                 key={quiz.id} 
                 className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
