@@ -13,7 +13,7 @@ import Settings from './pages/Settings';
 import ShareQuiz from './pages/ShareQuiz';
 import QuizExam from './pages/QuizExam';
 import JoinQuiz from './pages/JoinQuiz';
-import MongoDbIntegration from './pages/MongoDbIntegration';
+import PHPDatabaseGuide from './pages/PHPDatabaseGuide';
 
 const App: React.FC = () => {
   return (
@@ -31,7 +31,7 @@ const App: React.FC = () => {
         <Route path="/share/:quizId" element={<ShareQuiz />} />
         <Route path="/exam/:quizId" element={<QuizExam />} />
         <Route path="/join" element={<JoinQuiz />} />
-        <Route path="/mongodb-integration" element={<MongoDbIntegration />} />
+        <Route path="/php-database-guide" element={<PHPDatabaseGuide />} />
       </Routes>
       <Toaster />
     </Router>

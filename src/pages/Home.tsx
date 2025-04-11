@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, PenSquare, Users, Trophy, Database } from 'lucide-react';
+import { ArrowRight, PenSquare, Users, Trophy } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -106,21 +106,15 @@ const Home = () => {
           </div>
         </section>
         
-        {/* Database Integration Section */}
+        {/* PHP Database Integration Section */}
         <section className="py-12">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex-1">
-                <h2 className="text-3xl font-bold mb-4">MongoDB Integration</h2>
+                <h2 className="text-3xl font-bold mb-4">PHP Database Integration</h2>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  Need more scalability? Quick Quiz supports MongoDB integration for enterprise-level quiz management and analytics.
+                  Quick Quiz supports PHP and MySQL integration for enterprise-level quiz management and analytics.
                 </p>
-                <Button variant="outline" className="gap-2" asChild>
-                  <Link to="/mongodb-integration">
-                    <Database className="h-5 w-5" />
-                    Learn More
-                  </Link>
-                </Button>
               </div>
               <div className="flex-1 p-6 border rounded-lg bg-gray-50 dark:bg-gray-900">
                 <h3 className="text-xl font-semibold mb-3">Integration Benefits:</h3>
