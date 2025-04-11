@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/ui/toaster';
 import Home from './pages/Home';
 import CreateQuiz from './pages/CreateQuiz';
@@ -19,28 +17,24 @@ import MongoDbIntegration from './pages/MongoDbIntegration';
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/create" element={<CreateQuiz />} />
-            <Route path="/take" element={<TakeQuiz />} />
-            <Route path="/take/:quizId" element={<TakeQuiz />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/share/:quizId" element={<ShareQuiz />} />
-            <Route path="/exam/:quizId" element={<QuizExam />} />
-            <Route path="/join" element={<JoinQuiz />} />
-            <Route path="/mongodb-integration" element={<MongoDbIntegration />} />
-          </Routes>
-          <Toaster />
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create" element={<CreateQuiz />} />
+        <Route path="/take" element={<TakeQuiz />} />
+        <Route path="/take/:quizId" element={<TakeQuiz />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/share/:quizId" element={<ShareQuiz />} />
+        <Route path="/exam/:quizId" element={<QuizExam />} />
+        <Route path="/join" element={<JoinQuiz />} />
+        <Route path="/mongodb-integration" element={<MongoDbIntegration />} />
+      </Routes>
+      <Toaster />
+    </Router>
   );
 };
 
