@@ -57,6 +57,12 @@ export default {
           primary: "#6E59A5",
           accent: "#33C3F0",
           secondary: "#D6BCFA",
+          neutral: "#8E9196",        // Adding quiz-neutral color
+          "dark-neutral": "#555555", // Adding quiz-dark-neutral color
+          correct: "#10B981",        // Adding quiz-correct color
+          "dark-correct": "#059669", // Adding quiz-dark-correct color
+          incorrect: "#EF4444",      // Adding quiz-incorrect color  
+          "dark-incorrect": "#DC2626" // Adding quiz-dark-incorrect color
         }
       },
       borderRadius: {
